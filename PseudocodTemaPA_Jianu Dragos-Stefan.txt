@@ -1,0 +1,57 @@
+// Pseudocod pentru determinarea numărului minim de operații de editare
+
+DECLARE sir_regula AS STRING
+DECLARE fragment_cod AS STRING
+DECLARE n, m AS INTEGER
+DECLARE dp[105][105] AS INTEGER
+
+FUNCTION Min(a, b):
+    IF a > b THEN:
+        RETURN b
+    ELSE:
+        RETURN a
+    END IF
+END FUNCTION
+
+FUNCTION NrMinimOperatii(regula, fragment_cod, dp, n, m):
+    FOR i = 0 TO n:
+        dp[i][0] = i
+    END FOR
+    FOR j = 0 TO m:
+        dp[0][j] = j
+    END FOR
+
+    FOR i = 1 TO n:
+        FOR j = 1 TO m:
+            IF regula[i - 1] == fragment_cod[j - 1] THEN:
+                dp[i][j] = dp[i - 1][j - 1]
+            ELSE:
+                insert_cost = dp[i][j - 1] + 1
+                delete_cost = dp[i - 1][j] + 1
+                replace_cost = dp[i - 1][j - 1] + 1
+                IF i > 1 AND j > 1 AND regula[i - 2] == fragment_cod[j - 1] AND regula[i - 1] == fragment_cod[j - 2] THEN:
+                    swap_cost = dp[i - 2][j - 2] + 1
+                    replace_cost = Min(replace_cost, swap_cost)
+                END IF
+                dp[i][j] = Min(Min(insert_cost, delete_cost), replace_cost)
+            END IF
+        END FOR
+    END FOR
+
+    RETURN dp[n][m]
+END FUNCTION
+
+READ regula
+READ fragment_cod
+
+FOR i = 0 TO 100:
+    FOR j = 0 TO 100:
+        dp[i][j] = 0
+    END FOR
+END FOR
+
+n = length(regula)
+m = length(fragment_cod)
+
+nr_operatii = NrMinimOperatii(regula, fragment_cod, dp, n, m)
+PRINT "Numărul minim de operații: " + nr_operatii
